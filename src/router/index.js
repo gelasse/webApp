@@ -2,10 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 
-import Chat from './components/Chat.vue' 
-import Room from './components/Room.vue' 
-import AddRoom from './components/AddRoom.vue' 
-import Login from './components/Login.vue'
+
+import Room from '../components/Room.vue' 
+import AddRoom from '../components/AddRoom.vue' 
+import Login from '../components/Login.vue'
 
 Vue.use(VueRouter)
 
@@ -35,7 +35,7 @@ const routes = [
   {
     path: '/chat/:nickname/:roomid/:roomname',
     name: 'Chat',
-    component: Chat
+    component: () => import( '../components/Chat.vue')
   },
   {
     path: '/room/:nickname',
@@ -48,7 +48,7 @@ const routes = [
     component: AddRoom
   },
   {
-    path: '/',
+    path: '/login',
     name: 'Login',
     component: Login
   }
