@@ -82,6 +82,7 @@ export default {
         this.chats.push(item)
       });
     });
+    console.log(this.chats)
   },
   methods: {
     onSubmit (evt) {

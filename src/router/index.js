@@ -6,6 +6,7 @@ import Home from '../views/Home.vue'
 import Room from '../components/Room.vue' 
 import AddRoom from '../components/AddRoom.vue' 
 import Login from '../components/Login.vue'
+import Chat from '../components/Chat.vue'
 
 Vue.use(VueRouter)
 
@@ -35,7 +36,7 @@ const routes = [
   {
     path: '/chat/:nickname/:roomid/:roomname',
     name: 'Chat',
-    component: () => import( '../components/Chat.vue')
+    component: Chat
   },
   {
     path: '/room/:nickname',
