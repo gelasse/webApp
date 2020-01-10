@@ -7,10 +7,12 @@ import Room from '../components/Room.vue'
 import AddRoom from '../components/AddRoom.vue' 
 import Login from '../components/Login.vue'
 import Chat from '../components/Chat.vue'
+import Register from '../components/Register.vue'
+import Dashboard from '../components/Dashboard.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
+  const routes = [
   {
     path: '/',
     name: 'home',
@@ -52,7 +54,18 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
-  }
+  },
+    {
+    
+      path: '/register',
+        name: 'Register',
+        component: Register
+    },
+    {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: Dashboard
+    }
 ]
 
 const router = new VueRouter({
