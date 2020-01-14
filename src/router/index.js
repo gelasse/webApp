@@ -27,6 +27,7 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
 
+  
   {
     path: '/acueil',
     name: 'acueil',

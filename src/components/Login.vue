@@ -1,47 +1,39 @@
 <template>
-  <b-row>
-    <b-col cols="12">
-      <h2>
-        Login
-      </h2>
-      <b-jumbotron>
-        <b-form @submit="onSubmit">
-          <b-form-group>
-            <b-form-input id="nickname" v-model.trim="login.nickname" placeholder="Entrez votre pseudo"></b-form-input>
-          </b-form-group>
-          <b-button type="submit" variant="primary" :disabled="!login.nickname">Connexion</b-button>
-        </b-form>
-      </b-jumbotron>
-    </b-col>
-  </b-row>
+<div>
+  <h3>Veuillez vous connecter avec votre compte google s.v.p.</h3>
+  <button @click="connexion">Ce connecter avec google</button>
+</div> 
 </template>
 
 <script>
-
-import router from '../router'
-
+import firebase from 'firebase'
 export default {
-  name: 'AddBoard',
-  data () {
-    return {
-      login: { nickname: '' }
-    }
-  },
   methods: {
-    onSubmit (evt) {
-      evt.preventDefault()
+    connexion (){
+          var provider = new firebase.auth.GoogleAuthProvider();
+          provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 
-      router.push({
-        name: 'RoomList',
-        params: { nickname: this.login.nickname }
-      })
+
+          firebase.auth().signInWithPopup(provider).then(result=> {
+  // This gives you a Google Access Token. You can use it to access the Google API.
+  var token = result.credential.accessToken;
+  // The signed-in user info.
+  var user = result.user;
+  //to push to the main component
+  this.$router.push('/chat/:nickname/:roomid/:roomname')
+  // ...
+}).catch(function(error) {
+  // Handle Errors here.
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  // The email of the user's account used.
+  var email = error.email;
+  // The firebase.auth.AuthCredential type that was used.
+  var credential = error.credential;
+  // ...
+});
+
     }
   }
 }
 </script>
-
-<style>
-  .jumbotron {
-    padding: 2rem;
-  }
-</style>

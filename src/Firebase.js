@@ -1,7 +1,9 @@
 //imports of Firebase SDK module
 import * as firebase from 'firebase';
 
-  // Your web app's Firebase configuration
+// Required for side-effects
+require("firebase/firestore");  
+// Your web app's Firebase configuration
   var firebaseConfig = {
     apiKey: "AIzaSyDBZcolOUZ0rPmIWmu7662vmTHXpTbq4Yc",
     authDomain: "webappchat-71129.firebaseapp.com",
@@ -13,5 +15,9 @@ import * as firebase from 'firebase';
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+  // Initialize Cloud Firestore through Firebase
+
+var db = firebase.firestore();
+window.db = db;
 
   export default firebase;

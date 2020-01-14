@@ -1,228 +1,225 @@
-ontains the list of chat messages that iterated from the chats array, exit chat link, and the send message form.
-
 <template>
-  <b-row>
-    <b-col cols="12">
-      <h2>
-        {{roomname}}
-        <b-link @click="exitChat()">(Exit Chat)</b-link>
-      </h2>
-      <div class="chat-box" v-chat-scroll>
-        <b-list-group>
-          <b-list-group-item class="chat-item" v-for="chat in chats" :key="chat.key">
-            <div class="chat-status text-center" v-if="chat.type==='join'||chat.type==='exit'">
-              <span class="chat-date">{{chat.sendDate}}</span>
-              <span class="chat-content-center">{{chat.message}}</span>
-            </div>
-            <div v-else>
-              <div class="chat-message text-right" v-if="chat.user === nickname">
-                <div class="right-bubble">
-                  <span class="msg-name">Me</span>
-                  <span class="msg-date">{{chat.sendDate}}</span>
-                  <p text-wrap>{{chat.message}}</p>
-                </div>
-              </div>
-              <div class="chat-message text-left" text-left v-if="chat.user !== nickname">
-                <div class="left-bubble">
-                  <span class="msg-name">{{chat.user}}</span>
-                  <span class="msg-date">{{chat.sendDate}}</span>
-                  <p text-wrap>{{chat.message}}</p>
-                </div>
+  <div class="container">
+<div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+        </div>
+        <div class="mesgs">
+          <div class="msg_history">
+            <div v-for="message in messages" v-bind:key="message.id" class="incoming_msg">
+              <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+              <div class="received_msg">
+                <div class="received_withd_msg">
+                  <p>{{message.message}}</p>
+                  <span class="time_date"> {{message.createdAt}} {{message.itulisateur}} </span></div>
               </div>
             </div>
-          </b-list-group-item>
-        </b-list-group>
+          </div>
+          <div class="type_msg">
+            <div class="input_msg_write">
+              <input @keyup.enter="saveMessage" v-model="message" type="text" class="write_msg" placeholder="Type a message" />
+              <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
       </div>
-      <footer class="sticky-footer">
-        <b-form @submit="onSubmit">
-          <b-input-group>
-              <b-form-input id="message" v-model.trim="data.message" placeholder="Enter your message"></b-form-input>
-              <b-button type="submit" variant="primary" :disabled="!data.message">Send</b-button>
-          </b-input-group>
-        </b-form>
-      </footer>
-    </b-col>
-  </b-row>
+      
+      
+      <p class="text-center top_spac"> Design by <a target="_blank" href="#">Sunil Rajput</a></p>
+      
+    </div></div>
 </template>
 
-
-
 <script>
-
-import firebase from '../Firebase'
-import router from '../router'
-
+import firebase from 'firebase'
 export default {
-  name: 'Chat',
-  data () {
-    return {
-        roomid: this.$route.params.roomid,
-        roomname: this.$route.params.roomname,
-        nickname: this.$route.params.nickname,
-        data: { type:'', nickname:'', message:'' },
-        chats: [],
-        errors: [],
-        offStatus: false
+  name: "chat",
+
+  data(){
+    return{
+      message: null,
+      messages:[],
+      authUser: {}
     }
   },
-  created () {
-    let joinData = firebase.database().ref('chatrooms/'+this.roomid+'/chats').push();
-    joinData.set({
-      type: 'join',
-      user: this.nickname,
-      message: this.nickname+' has joined this room.',
-      sendDate: Date()
-    });
-    this.data.message = '';
-    firebase.database().ref('chatrooms/'+this.roomid+'/chats').on('value', (snapshot) => {
-      this.chats = [];
-      snapshot.forEach((doc) => {
-        let item = doc.val()
-        item.key = doc.key
-        this.chats.push(item)
-      });
-    });
-    console.log(this.chats)
-  },
-  methods: {
-    onSubmit (evt) {
-        evt.preventDefault()
-
-        let newData = firebase.database().ref('chatrooms/'+this.roomid+'/chats').push();
-        newData.set({
-            type: 'newmsg',
-            user: this.nickname,
-            message: this.data.message,
-            sendDate: Date()
-        });
-        this.data.message = '';
+  methods:{
+    glisserVersLeBas(){
+    let box = document.querySelector('.msg_history');
+    box.scrollTop = box.scrollHeight;
     },
-    exitChat () {
-      let exitData = firebase.database().ref('chatrooms/'+this.roomid+'/chats').push()
-      exitData.set({
-        type: 'exit',
-        user: this.nickname,
-        message: this.nickname+' has exited this room.',
-        sendDate: Date()
-      })
+    saveMessage(){
+      db.collection("chat").add({
+    message: this.message,
+    createdAt: new Date(),
+    itulisateur: this.authUser.displayName
+}).then(()=>{
+  this.glisserVersLeBas();
+})
+this.message = null;
 
-      this.offStatus = true
-      router.go(-1)
+    },
+    fetchMessages(){
+      db.collection("chat").orderBy("createdAt").onSnapshot((querySnapshot) => {
+        let allMessages=[];
+    querySnapshot.forEach((doc) => {
+      allMessages.push(doc.data());
+    });
+    this.messages=allMessages;
+});
+    setTimeout(()=>{
+      this.glisserVersLeBas();
+    },1000);
+
     }
+  },
+  created(){
+    firebase.auth().onAuthStateChanged(user =>{
+      if(user){
+        this.authUser=user;
+      }
+       else{
+         this.authUser={};
+       }
+    })
+    this.fetchMessages();
   }
 }
 </script>
 
+<style scoped>
+.container{max-width:1170px; margin:auto;}
+img{ max-width:100%;}
+.inbox_people {
+  background: #f8f8f8 none repeat scroll 0 0;
+  float: left;
+  overflow: hidden;
+  width: 40%; border-right:1px solid #c4c4c4;
+}
+.inbox_msg {
+  border: 1px solid #c4c4c4;
+  clear: both;
+  overflow: hidden;
+}
+.top_spac{ margin: 20px 0 0;}
 
 
-<style>
-  .chat-box {
-    height: 500px;
-    width: 100%;
-    overflow: scroll;
-  }
-  .chat-item {
-    border: none;
-  }
-  .chat-status {
-    min-height: 49px;
-  }
-  .chat-status .chat-date {
-    display: block;
-    font-size: 10px;
-    font-style: italic;
-    color: #999;
-    height: 15px;
-    left: 10%;
-    right:10%;
-  }
-  .chat-status .chat-content-center {
-    padding: 5px 10px;
-    background-color: #e1e1f7;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #555;
-    height: 34px;
-    left: 10%;
-    right:10%;
-  }
-  .chat-message {
-    width: 80%;
-    min-height: 40px;
-  }
-  .chat-message .right-bubble {
-    position: relative;
-    background: #dcf8c6;
-    border-top-left-radius: .4em;
-    border-bottom-left-radius: .4em;
-    border-bottom-right-radius: .4em;
-    padding: 5px 10px 10px;
-    left: 15%;
-  }
-  .chat-message .right-bubble span.msg-name {
-    font-size: 12px;
-    font-weight: bold;
-    color: green;
-    display: block;
-  }
-  .chat-message .right-bubble span.msg-date {
-    font-size: 10px;
-    display: block;
-  }
-  .chat-message .right-bubble:after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 0;
-    height: 0;
-    border: 27px solid transparent;
-    border-left-color: #dcf8c6;
-    border-right: 0;
-    border-top: 0;
-    margin-top: -0.5px;
-    margin-right: -27px;
-  }
-  .chat-message .left-bubble {
-    position: relative;
-    background: #efefef;
-    border-top-right-radius: .4em;
-    border-bottom-left-radius: .4em;
-    border-bottom-right-radius: .4em;
-    padding: 5px 10px 10px;
-    left: 5%;
-  }
-  .chat-message .left-bubble span.msg-name {
-    font-size: 12px;
-    font-weight: bold;
-    color: blue;
-    display: block;
-  }
-  .chat-message .left-bubble span.msg-date {
-    font-size: 10px;
-    display: block;
-  }
-  .chat-message .left-bubble:after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 0;
-    height: 0;
-    border: 27px solid transparent;
-    border-right-color: #efefef;
-    border-left: 0;
-    border-top: 0;
-    margin-top: -0.5px;
-    margin-left: -27px;
-  }
-  footer.sticky-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px;
-    background-color: #ffffff;
-    border-top: solid 1px #efefef;
-  }
+.recent_heading {float: left; width:40%;}
+.srch_bar {
+  display: inline-block;
+  text-align: right;
+  width: 60%; padding:
+}
+.headind_srch{ padding:10px 29px 10px 20px; overflow:hidden; border-bottom:1px solid #c4c4c4;}
+
+.recent_heading h4 {
+  color: #05728f;
+  font-size: 21px;
+  margin: auto;
+}
+.srch_bar input{ border:1px solid #cdcdcd; border-width:0 0 1px 0; width:80%; padding:2px 0 4px 6px; background:none;}
+.srch_bar .input-group-addon button {
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+  border: medium none;
+  padding: 0;
+  color: #707070;
+  font-size: 18px;
+}
+.srch_bar .input-group-addon { margin: 0 0 0 -27px;}
+
+.chat_ib h5{ font-size:15px; color:#464646; margin:0 0 8px 0;}
+.chat_ib h5 span{ font-size:13px; float:right;}
+.chat_ib p{ font-size:14px; color:#989898; margin:auto}
+.chat_img {
+  float: left;
+  width: 11%;
+}
+.chat_ib {
+  float: left;
+  padding: 0 0 0 15px;
+  width: 88%;
+}
+
+.chat_people{ overflow:hidden; clear:both;}
+.chat_list {
+  border-bottom: 1px solid #c4c4c4;
+  margin: 0;
+  padding: 18px 16px 10px;
+}
+.inbox_chat { height: 550px; overflow-y: scroll;}
+
+.active_chat{ background:#ebebeb;}
+
+.incoming_msg_img {
+  display: inline-block;
+  width: 6%;
+}
+.received_msg {
+  display: inline-block;
+  padding: 0 0 0 10px;
+  vertical-align: top;
+  width: 92%;
+ }
+ .received_withd_msg p {
+  background: #ebebeb none repeat scroll 0 0;
+  border-radius: 3px;
+  color: #646464;
+  font-size: 14px;
+  margin: 0;
+  padding: 5px 10px 5px 12px;
+  width: 100%;
+}
+.time_date {
+  color: #747474;
+  display: block;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+.received_withd_msg { width: 57%;}
+.mesgs {
+  float: left;
+  padding: 30px 15px 0 25px;
+  width: 60%;
+}
+
+ .sent_msg p {
+  background: #05728f none repeat scroll 0 0;
+  border-radius: 3px;
+  font-size: 14px;
+  margin: 0; color:#fff;
+  padding: 5px 10px 5px 12px;
+  width:100%;
+}
+.outgoing_msg{ overflow:hidden; margin:26px 0 26px;}
+.sent_msg {
+  float: right;
+  width: 46%;
+}
+.input_msg_write input {
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+  border: medium none;
+  color: #4c4c4c;
+  font-size: 15px;
+  min-height: 48px;
+  width: 100%;
+}
+
+.type_msg {border-top: 1px solid #c4c4c4;position: relative;}
+.msg_send_btn {
+  background: #05728f none repeat scroll 0 0;
+  border: medium none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 17px;
+  height: 33px;
+  position: absolute;
+  right: 0;
+  top: 11px;
+  width: 33px;
+}
+.messaging { padding: 0 0 50px 0;}
+.msg_history {
+  height: 516px;
+  overflow-y: auto;
+}
 </style>

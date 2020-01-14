@@ -5,13 +5,21 @@
       <router-link to="/about">Details</router-link>
       <router-link to="/acueil">Acueil</router-link>
       <router-link to="/chat/:nickname/:roomid/:roomname">Chat</router-link> 
-      <router-link to="/room/:nickname">Room</router-link>
-      <router-link to="/add-room">Add-Room</router-link>
+      <!-- <router-link to="/room/:nickname">Room</router-link>
+      <router-link to="/add-room">Add-Room</router-link> -->
       <router-link to="/login">Login</router-link>
     </div>
     <router-view/>
   </div>
+  <!--<Pied />-->
 </template>
+
+<script>
+//import Pied from '../components/Pied.vue'
+export default {
+  //components: {Pied}
+}
+</script>
 
 <style>
 #app {
